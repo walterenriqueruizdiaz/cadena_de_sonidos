@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CADENA DE SONIDOS</title>
+<style>
+:root{--bg:#fff;--tx:#0F3D36;--card:#F2FAF8;--g:#1F7A6B;--o:#FF8C4B;--ot:#0F3D36;--line:#1F7A6B;--ok:#0B6B3A;--er:#9A3A00;--sel:#D9F0EB;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F2A26;--tx:#F0FAF7;--card:#16413A;--line:#5FC4B0;--ok:#7FE3A8;--er:#FFB27F;--sel:#1F5A50}}
+:root[data-theme="dark"]{--bg:#0F2A26;--tx:#F0FAF7;--card:#16413A;--line:#5FC4B0;--ok:#7FE3A8;--er:#FFB27F;--sel:#1F5A50}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--tx);font:800 20px/1.3 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;letter-spacing:.04em;text-transform:uppercase}
+main{max-width:720px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:14px;min-height:100vh}
+h1{font-size:clamp(34px,10vw,56px);line-height:1.05;margin:8px 0;color:var(--g)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) h1{color:#5FC4B0}}
+h2{font-size:clamp(24px,6vw,32px);margin:0}
+p{margin:0}
+.btn{min-height:64px;padding:12px 20px;border:3px solid var(--g);border-radius:16px;background:var(--bg);color:var(--tx);font:inherit;cursor:pointer;width:100%}
+.btn.pri{background:var(--g);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.w:focus-visible,.opt:focus-visible{outline:4px solid var(--o);outline-offset:2px}
+.btn.big{font-size:24px}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+.lv{display:flex;flex-direction:column;gap:10px}
+.lv .btn[aria-pressed="true"]{background:var(--sel);box-shadow:inset 0 0 0 3px var(--o)}
+.lv .btn[aria-pressed="true"]::before{content:"✓ "}
+.w{display:flex;align-items:center;justify-content:center;gap:4px;border:3px dashed var(--line);border-radius:16px;background:var(--card);color:var(--tx);font:inherit;font-size:clamp(22px,6.5vw,30px);padding:12px 8px;min-height:72px;cursor:pointer;width:100%}
+.w .i,.w .f{display:inline-flex;align-items:center;justify-content:center;min-width:1.5em;padding:.15em .3em;border-radius:.5em;line-height:1.2}
+.w .i{background:var(--g);color:#fff}
+.w .f{background:var(--o);color:var(--ot)}
+.w .m{padding:0 2px}
+.w.sm{font-size:clamp(18px,5vw,24px);min-height:56px;padding:8px 6px;cursor:default;width:auto}
+.w.last{border-style:solid;box-shadow:0 0 0 4px var(--o)}
+.w.used{opacity:.4}
+.shake{animation:sh .4s}
+@keyframes sh{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border:3px solid var(--line);border-radius:16px;padding:10px;min-height:84px;max-height:36vh;overflow-y:auto}
+.chain .ar{font-size:22px;color:var(--o)}
+.empty{opacity:.7;font-size:18px}
+.ins{background:var(--sel);border-radius:14px;padding:12px 14px}
+.fb{min-height:1.4em;font-size:20px}
+.fb.ok{color:var(--ok)}.fb.er{color:var(--er)}
+.grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:480px){.grid{grid-template-columns:1fr 1fr}.lv{flex-direction:row}}
+.bar{position:sticky;bottom:0;background:var(--bg);padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));margin-top:auto;border-top:3px solid var(--line)}
+.big-n{font-size:clamp(56px,18vw,96px);color:var(--g);line-height:1}
+.q{border:3px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.opt{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:84px;padding:8px 4px;border:3px solid var(--line);border-radius:14px;background:var(--bg);color:var(--tx);font:inherit;font-size:14px;cursor:pointer}
+.opt span{font-size:34px;line-height:1.1;text-transform:none}
+.opt[aria-pressed="true"]{background:var(--sel);box-shadow:inset 0 0 0 3px var(--o)}
+.opt[aria-pressed="true"]::after{content:"✓"}
+.hid{display:none}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+var N1=["MESA","SAPO","POLLO","OSO","SOL","LUNA","ÁRBOL","LÁPIZ","ZORRO","ROPA","PAN","NIDO","OJO","OLLA","ANILLO","OSITO"];
+var N2=["BRAZO","OTOÑO","OVEJA","ÁRDILLA","AVESTRUZ","ZAPATO","OSTRA","ANTEOJO"];
+var DECKS={"1":N1,"2":N2,"3":N1.concat(N2)};
+var S={screen:"home",level:"1",chain:[],pool:[],fb:"",fbc:"",shake:null,ex:0,last:null,ans:{}};
+var Q=["PUDE ENCONTRAR EL SONIDO INICIAL Y FINAL DE CADA PALABRA.","ME RESULTÓ FÁCIL ARMAR LA CADENA.","ME COSTÓ ENCONTRAR TARJETAS PARA SEGUIR LA CADENA.","ME GUSTARÍA VOLVER A JUGAR A LA CADENA DE SONIDOS."];
+var OPT=[["😀","SÍ"],["😐","MÁS O MENOS"],["🙁","NO"]];
+function nz(c){return c.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase()}
+function fi(w){return nz(w[0])}
+function la(w){return nz(w[w.length-1])}
+function shuf(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function inner(w){var l=Array.from(w);return '<span class="i">'+l[0]+'</span><span class="m">'+l.slice(1,-1).join("")+'</span><span class="f">'+l[l.length-1]+'</span>'}
+function sm(w,last){return '<span class="w sm'+(last?' last':'')+'">'+inner(w)+'</span>'}
+function go(s){S.screen=s;render();window.scrollTo(0,0)}
+function start(){S.chain=[];S.pool=shuf(DECKS[S.level]);S.fb="";S.fbc="";S.shake=null;go("game")}
+function lvl(l){S.level=l;render()}
+function pick(w){
+ var c=S.chain;
+ if(c.length&&la(c[c.length-1])!==fi(w)){
+  S.shake=w;S.fbc="er";
+  S.fb="✗ CASI. ESA EMPIEZA CON LA "+nz(w[0])+". BUSCÁ UNA CON LA "+la(c[c.length-1]);
+ }else{
+  c.push(w);S.pool=S.pool.filter(function(x){return x!==w});S.shake=null;S.fbc="ok";S.fb="✓ ¡MUY BIEN!";
+ }
+ render();
+ var ch=document.getElementById("chain");if(ch)ch.scrollTop=ch.scrollHeight;
+}
+function undo(){if(S.chain.length){var w=S.chain.pop();S.pool.splice(Math.floor(Math.random()*(S.pool.length+1)),0,w);S.fb="";S.fbc="";S.shake=null;render()}}
+function finish(){S.n=S.chain.length;S.final=S.chain.slice();S.prev=S.last;S.last=S.n;S.ans={};go("end")}
+function moves(){var c=S.chain;if(!c.length)return true;var e=la(c[c.length-1]);return S.pool.some(function(w){return fi(w)===e})}
+function ans(q,v){S.ans[q]=v;render()}
+var EX=[["MESA","ESTA ES LA PRIMERA TARJETA. TERMINA CON A."],["ÁRBOL","MESA TERMINA CON A. ÁRBOL EMPIEZA CON A. ¡ENCAJA!"],["LUNA","ÁRBOL TERMINA CON L. LUNA EMPIEZA CON L. ¡ENCAJA!"],["AVIÓN","LUNA TERMINA CON A. AVIÓN EMPIEZA CON A. ¡ENCAJA!"]];
+function render(){
+ var h="",a=document.getElementById("app");
+ if(S.screen==="home"){
+  h='<h1>CADENA DE SONIDOS</h1><p class="ins">UNÍ LAS PALABRAS: EL SONIDO DEL FINAL TIENE QUE SER IGUAL AL SONIDO DEL PRINCIPIO.</p>'+
+  '<div class="chain" aria-hidden="true">'+sm("MESA")+'<span class="ar">➜</span>'+sm("ÁRBOL")+'<span class="ar">➜</span>'+sm("LUNA")+'</div>'+
+  '<h2>ELEGÍ UN NIVEL</h2><div class="lv">'+
+  [["1","NIVEL 1"],["2","NIVEL 2"],["3","LOS DOS"]].map(function(x){return '<button class="btn" aria-pressed="'+(S.level===x[0])+'" onclick="lvl(\''+x[0]+'\')">'+x[1]+'</button>'}).join("")+
+  '</div><button class="btn pri big" onclick="start()">JUGAR</button><button class="btn" onclick="S.ex=0;go(\'how\')">¿CÓMO SE JUEGA?</button>';
+ }else if(S.screen==="how"){
+  var e=EX[S.ex];
+  h='<h2>¿CÓMO SE JUEGA?</h2><div class="chain">'+EX.slice(0,S.ex+1).map(function(x,i){return (i?'<span class="ar">➜</span>':'')+sm(x[0],i===S.ex)}).join("")+'</div>'+
+  '<p class="ins" aria-live="polite">'+e[1]+'</p>'+
+  '<p>VERDE = CÓMO EMPIEZA. NARANJA = CÓMO TERMINA.</p>'+
+  (S.ex<3?'<button class="btn pri big" onclick="S.ex++;render()">SIGUIENTE</button>':'<button class="btn pri big" onclick="start()">¡LISTO! JUGAR</button>')+
+  '<button class="btn" onclick="go(\'home\')">VOLVER</button>';
+ }else if(S.screen==="game"){
+  var c=S.chain,ins;
+  if(!c.length)ins="ELEGÍ UNA TARJETA PARA EMPEZAR";
+  else if(moves()){var e2=la(c[c.length-1]);ins='BUSCÁ UNA PALABRA QUE EMPIECE CON LA <span class="w sm" style="display:inline-flex;min-height:0;padding:0"><span class="f">'+e2+'</span></span>'}
+  else ins="¡NO HAY MÁS TARJETAS PARA UNIR! ¡ARMASTE UNA CADENA GRANDE!";
+  var noM=c.length&&!moves();
+  h='<h2>ARMÁ LA CADENA</h2><p class="ins">'+ins+'</p><p class="fb '+S.fbc+'" role="status" aria-live="polite">'+S.fb+'</p>'+
+  '<div class="chain" id="chain">'+(c.length?c.map(function(w,i){return (i?'<span class="ar">➜</span>':'')+sm(w,i===c.length-1)}).join(""):'<span class="empty">TU CADENA VA A APARECER ACÁ</span>')+'</div>'+
+  '<div class="grid">'+S.pool.map(function(w){return '<button class="w'+(S.shake===w?' shake':'')+'" onclick="pick(\''+w+'\')" aria-label="'+w+'">'+inner(w)+'</button>'}).join("")+'</div>'+
+  '<div class="bar row"><button class="btn" onclick="undo()"'+(c.length?'':' disabled')+'>↶ DESHACER</button><button class="btn '+(noM?'pri':'')+'" onclick="finish()"'+(c.length?'':' disabled')+'>TERMINÉ</button></div>';
+ }else if(S.screen==="end"){
+  var d="";
+  if(S.prev!=null){d=S.n>S.prev?"¡MÁS QUE LA RONDA ANTERIOR ("+S.prev+")!":S.n===S.prev?"IGUAL QUE LA RONDA ANTERIOR ("+S.prev+").":"LA RONDA ANTERIOR FUE DE "+S.prev+". ¡PROBÁ DE NUEVO!"}
+  h='<h2>¡LO LOGRASTE!</h2><p>UNISTE</p><div class="big-n">'+S.n+'</div><p>'+(S.n===1?'TARJETA':'TARJETAS')+'</p>'+(d?'<p class="ins">'+d+'</p>':'')+
+  '<div class="chain">'+S.final.map(function(w,i){return (i?'<span class="ar">➜</span>':'')+sm(w)}).join("")+'</div>'+
+  '<button class="btn pri big" onclick="start()">JUGAR DE NUEVO</button><button class="btn" onclick="go(\'fb\')">¿CÓMO ME FUE?</button><button class="btn" onclick="go(\'home\')">CAMBIAR DE NIVEL</button>';
+ }else if(S.screen==="fb"){
+  h='<h2>¿CÓMO ME FUE?</h2><p>TOCÁ UNA CARITA EN CADA FRASE.</p>'+Q.map(function(q,i){
+   return '<div class="q"><p>'+q+'</p><div class="opts">'+OPT.map(function(o,j){return '<button class="opt" aria-pressed="'+(S.ans[i]===j)+'" onclick="ans('+i+','+j+')"><span aria-hidden="true">'+o[0]+'</span>'+o[1]+'</button>'}).join("")+'</div></div>'}).join("")+
+  '<button class="btn pri big" onclick="go(\'bye\')">CERRAR</button>';
+ }else{
+  h='<h1>¡GRACIAS POR JUGAR!</h1><p class="ins">¡HASTA LA PRÓXIMA!</p><button class="btn pri big" onclick="go(\'home\')">VOLVER AL INICIO</button>';
+ }
+ a.innerHTML=h;
+}
+render();
+</script>
+</body>
+</html>
